@@ -86,6 +86,9 @@
 /* Operating system.  */
 #define PRINT_OPERATING_SYSTEM 128
 
+/* Operating system.  */
+#define PRINT_XXX 256
+
 static struct option const uname_long_options[] =
 {
   {"all", no_argument, NULL, 'a'},
@@ -99,6 +102,7 @@ static struct option const uname_long_options[] =
   {"processor", no_argument, NULL, 'p'},
   {"hardware-platform", no_argument, NULL, 'i'},
   {"operating-system", no_argument, NULL, 'o'},
+  {"xxx", no_argument, NULL, 'x'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -137,6 +141,7 @@ Print certain system information.  With no OPTION, same as -s.\n\
   -p, --processor          print the processor type (non-portable)\n\
   -i, --hardware-platform  print the hardware platform (non-portable)\n\
   -o, --operating-system   print the operating system\n\
+  -x, --xxx                try it yourself :)\n\
 "), stdout);
         }
       else
@@ -175,7 +180,7 @@ static int
 decode_switches (int argc, char **argv)
 {
   int c;
-  unsigned int toprint = 0;
+  unsigned long toprint = 0;
 
   if (uname_mode == UNAME_ARCH)
     {
@@ -202,7 +207,8 @@ decode_switches (int argc, char **argv)
           switch (c)
             {
             case 'a':
-              toprint = UINT_MAX;
+              // toprint = UINT_MAX;
+              toprint = 255;
               break;
 
             case 's':
@@ -235,6 +241,10 @@ decode_switches (int argc, char **argv)
 
             case 'o':
               toprint |= PRINT_OPERATING_SYSTEM;
+              break;
+
+            case 'x':
+              toprint |= PRINT_XXX;
               break;
 
             case_GETOPT_HELP_CHAR;
@@ -276,27 +286,35 @@ main (int argc, char **argv)
 
   if (toprint == 0)
     toprint = PRINT_KERNEL_NAME;
+  
 
-  if (toprint
-       & (PRINT_KERNEL_NAME | PRINT_NODENAME | PRINT_KERNEL_RELEASE
-          | PRINT_KERNEL_VERSION | PRINT_MACHINE))
-    {
-      struct utsname name;
+  // if (toprint & PRINT_XXX)
+  //   print_element ("| My name na?\n| My name is Uvuvwevwevwe onyetenyevwe ugwemuhwem osas");
+  //   // fputs (element, stdout)
+  // else {
+    if (toprint
+        & (PRINT_KERNEL_NAME | PRINT_NODENAME | PRINT_KERNEL_RELEASE
+            | PRINT_KERNEL_VERSION | PRINT_MACHINE | PRINT_XXX ))
+      {
+        struct utsname name;
 
-      if (uname (&name) == -1)
-        die (EXIT_FAILURE, errno, _("cannot get system name"));
+        if (uname (&name) == -1)
+          die (EXIT_FAILURE, errno, _("cannot get system name"));
 
-      if (toprint & PRINT_KERNEL_NAME)
-        print_element (name.sysname);
-      if (toprint & PRINT_NODENAME)
-        print_element (name.nodename);
-      if (toprint & PRINT_KERNEL_RELEASE)
-        print_element (name.release);
-      if (toprint & PRINT_KERNEL_VERSION)
-        print_element (name.version);
-      if (toprint & PRINT_MACHINE)
-        print_element (name.machine);
-    }
+        if (toprint & PRINT_KERNEL_NAME)
+          print_element (name.sysname);
+        if (toprint & PRINT_NODENAME)
+          print_element (name.nodename);
+        if (toprint & PRINT_KERNEL_RELEASE)
+          print_element (name.release);
+        if (toprint & PRINT_KERNEL_VERSION)
+          print_element (name.version);
+        if (toprint & PRINT_MACHINE)
+          print_element (name.machine);
+        if (toprint & PRINT_XXX)
+          print_element ("\n| My name na? \n| My name is Uvuvwevwevwe onyetenyevwe ugwemuhwem osas\n");
+      }
+    // }
 
   if (toprint & PRINT_PROCESSOR)
     {
